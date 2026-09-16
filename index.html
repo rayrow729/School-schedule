@@ -2,6 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>מערכת שעות – כיתה ג' זוהר</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,14 +30,24 @@
   @page{ size: A4 landscape; margin: 0; }
 
   .page{
-    width:297mm;
-    height:210mm;
+    width:100%;
+    max-width:1200px;
     margin:0 auto;
     background:#ffffff;
-    padding:9mm 12mm;
-    overflow:hidden;
+    padding:16px 20px;
     display:flex;
     flex-direction:column;
+  }
+
+  @media print{
+    .page{
+      width:297mm;
+      height:210mm;
+      max-width:none;
+      padding:9mm 12mm;
+      overflow:hidden;
+    }
+    table{ height:100%; }
   }
 
   .header{
@@ -53,7 +64,7 @@
 
   table{
     width:100%;
-    height:100%;
+    height:auto;
     border-collapse:separate;
     border-spacing:3px;
     table-layout:fixed;
@@ -96,7 +107,7 @@
 
   td.sun{ background:var(--sun); }
   td.mon{ background:var(--mon); }
-  td.tue{ background:var(--tue); }
+  td.tue{ background:var(--tue); height:1px; }
   td.wed{ background:var(--wed); }
   td.thu{ background:var(--thu); }
   td.fri{ background:var(--fri); }
@@ -164,6 +175,114 @@
     margin-top:2px;
     flex:0 0 auto;
   }
+
+  .table-wrap{ flex:1 1 auto; min-height:0; min-width:0; }
+
+  .instructions{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:#F1F8FF;
+    border:2px solid #BFE0FF;
+    border-radius:12px;
+    padding:8px 14px;
+    margin-bottom:8px;
+  }
+  .instructions .txt{ flex:1 1 auto; }
+  .instructions .txt .title{ font-size:14px; font-weight:800; margin:0 0 2px; }
+  .instructions .txt .desc{ font-size:11.5px; color:#555; margin:0; }
+  .instructions .actions{ display:flex; gap:8px; flex:0 0 auto; }
+
+  .start-btn, .print-btn{
+    flex:0 0 auto;
+    border:none;
+    border-radius:9px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    padding:9px 16px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .start-btn{ background:#2f6fed; color:#fff; }
+  .start-btn:hover{ background:#255ac4; }
+  .print-btn{ background:#fff; color:#2f6fed; border:2px solid #2f6fed; }
+  .print-btn:hover{ background:#eaf1ff; }
+  .start-btn.active{ background:#1f9d55; }
+  .start-btn.active:hover{ background:#187d43; }
+  .clear-btn{ background:#fff; color:#a3242f; border:2px solid #e3aab0; }
+  .clear-btn:hover{ background:#fdecee; }
+
+  .instructions .disclaimer{
+    font-size:9.5px;
+    color:#8a8a8a;
+    margin:4px 0 0;
+  }
+
+  body.selecting-mode .chip,
+  body.selecting-mode .list-item{
+    cursor:pointer;
+    outline:1.5px dashed #2f6fed;
+    outline-offset:1px;
+    background:rgba(47,111,237,0.08);
+  }
+
+  .chip.selected,
+  .list-item.selected{
+    outline:3px solid #1565c0 !important;
+    outline-offset:1px;
+    background:rgba(21,101,192,0.08) !important;
+  }
+
+  @media print{
+    .instructions{ display:none !important; }
+    body.selecting-mode .chip,
+    body.selecting-mode .list-item{
+      outline:none;
+      background:inherit;
+    }
+  }
+
+  @media screen and (max-width:900px){
+    body{ background:#ffffff; }
+    .page{
+      width:100%;
+      height:auto;
+      min-height:100vh;
+      padding:10px;
+      overflow:visible;
+    }
+    .header h1{ font-size:19px; }
+    .header .badge{ font-size:18px; }
+    .table-wrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      border-radius:10px;
+    }
+    table{
+      height:auto;
+      min-width:900px;
+    }
+    .footer{ margin-top:8px; font-size:10px; }
+
+    .instructions{
+      flex-direction:column;
+      align-items:stretch;
+      gap:10px;
+      padding:10px 12px;
+    }
+    .instructions .actions{
+      flex-wrap:wrap;
+      width:100%;
+    }
+    .start-btn, .print-btn, .clear-btn{
+      flex:1 1 auto;
+      padding:11px 14px;
+      font-size:13.5px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -178,6 +297,20 @@
     <div class="badge">📚</div>
   </div>
 
+  <div class="instructions">
+    <div class="txt">
+      <p class="title" id="instr-title">👪 בניית מערכת אישית לילד/ה שלכם</p>
+      <p class="desc" id="instr-desc">בחרו יחד עם הילד/ה את השיעורים שלו/ה במערכת, ולאחר מכן ניתן להדפיס מערכת מותאמת אישית. אפשר גם להדפיס את המערכת הרגילה בלי לבחור כלום.</p>
+      <p class="disclaimer" id="disclaimer" hidden>הבחירות נשמרות רק בדפדפן הזה, במכשיר הזה. הן לא נשלחות ולא נשמרות בשום מקום אחר, וימחקו אם ינוקה מידע הגלישה בדפדפן.</p>
+    </div>
+    <div class="actions">
+      <button class="start-btn" id="start-btn" type="button">🎯 בחירת שיעורים</button>
+      <button class="print-btn" type="button" onclick="window.print()">🖨️ הדפסת מערכת</button>
+      <button class="clear-btn" id="clear-btn" type="button" hidden>🗑️ ניקוי כל הבחירות</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -327,9 +460,119 @@
 
     </tbody>
   </table>
+  </div>
 
   <div class="footer">כיתה ג׳ זוהר</div>
 
 </div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'zohar3-schedule-selections-v1';
+  var DAY_CLASSES = ['sun','mon','tue','wed','thu','fri'];
+  var selecting = false;
+  var selections = new Set();
+  try{
+    selections = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+  }catch(e){ selections = new Set(); }
+
+  var startBtn = document.getElementById('start-btn');
+  var clearBtn = document.getElementById('clear-btn');
+  var titleEl = document.getElementById('instr-title');
+  var descEl = document.getElementById('instr-desc');
+  var disclaimerEl = document.getElementById('disclaimer');
+
+  var IDLE_TITLE = '👪 בניית מערכת אישית לילד/ה שלכם';
+  var IDLE_DESC = 'בחרו יחד עם הילד/ה את השיעורים שלו/ה במערכת, ולאחר מכן ניתן להדפיס מערכת מותאמת אישית. אפשר גם להדפיס את המערכת הרגילה בלי לבחור כלום.';
+  var SELECTING_TITLE = '✏️ מצב בחירה פעיל';
+  var SELECTING_DESC = 'לחצו על כל שיעור שהילד/ה משתתפ/ת בו כדי לסמן אותו. לחיצה נוספת מבטלת את הסימון. בסיום, לחצו על "סיימתי".';
+
+  function getChips(){
+    return document.querySelectorAll('.chip, .list-item');
+  }
+
+  function chipId(chip){
+    var td = chip.closest('td');
+    if(!td) return null;
+    var tr = td.closest('tr');
+    var timeCell = tr ? tr.querySelector('td.time .pnum') : null;
+    var period = timeCell ? timeCell.textContent.trim() : '0';
+    var dayClass = 'x';
+    for(var i=0;i<DAY_CLASSES.length;i++){
+      if(td.classList.contains(DAY_CLASSES[i])){ dayClass = DAY_CLASSES[i]; break; }
+    }
+    var subjEl = chip.querySelector('.subj');
+    var subj = subjEl ? subjEl.textContent.trim() : chip.textContent.trim();
+    return dayClass + '-' + period + '-' + subj;
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(selections))); }catch(e){}
+  }
+
+  function applyHighlights(){
+    getChips().forEach(function(chip){
+      var id = chipId(chip);
+      chip.classList.toggle('selected', !!id && selections.has(id));
+    });
+    var hasSelections = selections.size > 0;
+    clearBtn.hidden = !hasSelections;
+    disclaimerEl.hidden = !hasSelections;
+  }
+
+  function onChipClick(e){
+    if(!selecting) return;
+    var chip = e.currentTarget;
+    var td = chip.closest('td');
+    var id = chipId(chip);
+    if(!id) return;
+    var groupChips = td.querySelectorAll('.chip, .list-item');
+    var wasSelected = selections.has(id);
+    groupChips.forEach(function(c){
+      var cid = chipId(c);
+      if(cid) selections.delete(cid);
+    });
+    if(!wasSelected){ selections.add(id); }
+    save();
+    applyHighlights();
+  }
+
+  function enterSelecting(){
+    selecting = true;
+    document.body.classList.add('selecting-mode');
+    startBtn.textContent = '✅ סיימתי';
+    startBtn.classList.add('active');
+    titleEl.textContent = SELECTING_TITLE;
+    descEl.textContent = SELECTING_DESC;
+  }
+
+  function exitSelecting(){
+    selecting = false;
+    document.body.classList.remove('selecting-mode');
+    startBtn.textContent = '🎯 בחירת שיעורים';
+    startBtn.classList.remove('active');
+    titleEl.textContent = IDLE_TITLE;
+    descEl.textContent = IDLE_DESC;
+  }
+
+  startBtn.addEventListener('click', function(){
+    if(selecting){ exitSelecting(); } else { enterSelecting(); }
+  });
+
+  clearBtn.addEventListener('click', function(){
+    var ok = window.confirm('למחוק את כל הבחירות של הילד/ה? לא ניתן לשחזר את זה.');
+    if(!ok) return;
+    selections.clear();
+    save();
+    applyHighlights();
+  });
+
+  getChips().forEach(function(chip){
+    chip.addEventListener('click', onChipClick);
+  });
+
+  applyHighlights();
+})();
+</script>
 </body>
 </html>
