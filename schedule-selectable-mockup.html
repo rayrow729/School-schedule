@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מערכת שעות – כיתה ג' זוהר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sun:#FFF4E0;   --sun-b:#F4C98B;
+    --mon:#E3F2FF;   --mon-b:#9CCBF0;
+    --tue:#E9F7EA;   --tue-b:#A9DDAE;
+    --wed:#FBEBFA;   --wed-b:#E3AEE0;
+    --thu:#FFF0F0;   --thu-b:#F0AFAF;
+    --fri:#F1EEFF;   --fri-b:#C8BCF5;
+    --ink:#2E2E2E;
+    --break:#E7E7E7;
+    --break-ink:#6b6b6b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Rubik',sans-serif;
+    color:var(--ink);
+    background:#f7f6f3;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  @page{ size: A4 landscape; margin: 0; }
+
+  .page{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    background:#ffffff;
+    padding:16px 20px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  @media print{
+    .page{
+      width:297mm;
+      height:210mm;
+      max-width:none;
+      padding:9mm 12mm;
+      overflow:hidden;
+    }
+    table{ height:100%; }
+  }
+
+  .header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    margin-bottom:6px;
+    flex:0 0 auto;
+  }
+  .header .badge{ font-size:22px; line-height:1; }
+  .header h1{ font-size:24px; font-weight:800; margin:0; letter-spacing:0.3px; }
+  .header .sub{ font-size:10px; color:#9a9a9a; font-weight:500; text-align:center; margin-top:1px; }
+
+  table{
+    width:100%;
+    height:auto;
+    border-collapse:separate;
+    border-spacing:3px;
+    table-layout:fixed;
+    flex:1 1 auto;
+  }
+
+  thead th{
+    font-size:15px;
+    font-weight:700;
+    padding:4px 4px;
+    border-radius:10px;
+    text-align:center;
+  }
+  th.time-head{ width:11%; background:#2f2f2f; color:#fff; }
+  th.sun{ background:var(--sun); border:2px solid var(--sun-b); }
+  th.mon{ background:var(--mon); border:2px solid var(--mon-b); }
+  th.tue{ background:var(--tue); border:2px solid var(--tue-b); }
+  th.wed{ background:var(--wed); border:2px solid var(--wed-b); }
+  th.thu{ background:var(--thu); border:2px solid var(--thu-b); }
+  th.fri{ background:var(--fri); border:2px solid var(--fri-b); }
+
+  th .daynum{ display:block; font-size:17px; }
+  th .dayname{ display:block; }
+
+  td{
+    vertical-align:top;
+    border-radius:10px;
+    padding:3px 5px;
+  }
+
+  td.time{
+    background:#2f2f2f;
+    color:#fff;
+    text-align:center;
+    font-weight:700;
+    vertical-align:middle;
+  }
+  td.time .pnum{ font-size:21px; display:block; }
+  td.time .ptime{ font-size:10.5px; color:#d8d8d8; display:block; margin-top:1px; }
+
+  td.sun{ background:var(--sun); }
+  td.mon{ background:var(--mon); }
+  td.tue{ background:var(--tue); height:1px; }
+  td.wed{ background:var(--wed); }
+  td.thu{ background:var(--thu); }
+  td.fri{ background:var(--fri); }
+  td.empty{ background:#fafafa; }
+
+  .chip{
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+    background:rgba(255,255,255,0.8);
+    border-radius:7px;
+    padding:3px 6px;
+    line-height:1.15;
+    margin-bottom:2.5px;
+  }
+  .chip:last-child{ margin-bottom:0; }
+  .chip .ic{ font-size:18px; line-height:1; align-self:center; }
+  .chip .subj{ font-size:15px; font-weight:700; }
+  .chip .who{ font-weight:400; color:#767676; font-size:11px; }
+
+  .tue-cell{ display:flex; align-items:stretch; height:100%; gap:4px; }
+  .tue-spine{
+    flex:0 0 auto;
+    width:34px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    background:rgba(169,221,174,0.65);
+    border-radius:7px;
+    overflow:hidden;
+  }
+  .tue-spine .spine-ic{ font-size:15px; line-height:1; }
+  .tue-spine .spine-text{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-size:15px;
+    font-weight:800;
+    white-space:nowrap;
+    letter-spacing:0.5px;
+    line-height:1;
+  }
+  .tue-main{ flex:1 1 auto; display:flex; align-items:center; min-width:0; }
+  .list-item{ display:flex; align-items:center; gap:5px; width:100%; padding:2px 3px; }
+  .list-item .ic{ font-size:18px; line-height:1; }
+  .list-item .subj{ font-size:15px; font-weight:700; line-height:1.15; }
+
+  tr.break td{
+    background:var(--break);
+    color:var(--break-ink);
+    text-align:right;
+    font-weight:700;
+    font-size:13px;
+    padding:2.5px;
+    border-radius:8px;
+  }
+  tr.break td .ic{ margin-left:5px; }
+  .brk-label{ display:inline-block; width:11%; text-align:center; }
+
+  .footer{
+    text-align:center;
+    font-size:8px;
+    color:#b3b3b3;
+    margin-top:2px;
+    flex:0 0 auto;
+  }
+
+  .table-wrap{ flex:1 1 auto; min-height:0; }
+
+  .instructions{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:#F1F8FF;
+    border:2px solid #BFE0FF;
+    border-radius:12px;
+    padding:8px 14px;
+    margin-bottom:8px;
+  }
+  .instructions .txt{ flex:1 1 auto; }
+  .instructions .txt .title{ font-size:14px; font-weight:800; margin:0 0 2px; }
+  .instructions .txt .desc{ font-size:11.5px; color:#555; margin:0; }
+  .instructions .actions{ display:flex; gap:8px; flex:0 0 auto; }
+
+  .start-btn, .print-btn{
+    flex:0 0 auto;
+    border:none;
+    border-radius:9px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13px;
+    padding:9px 16px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .start-btn{ background:#2f6fed; color:#fff; }
+  .start-btn:hover{ background:#255ac4; }
+  .print-btn{ background:#fff; color:#2f6fed; border:2px solid #2f6fed; }
+  .print-btn:hover{ background:#eaf1ff; }
+  .start-btn.active{ background:#1f9d55; }
+  .start-btn.active:hover{ background:#187d43; }
+  .clear-btn{ background:#fff; color:#a3242f; border:2px solid #e3aab0; }
+  .clear-btn:hover{ background:#fdecee; }
+
+  .instructions .disclaimer{
+    font-size:9.5px;
+    color:#8a8a8a;
+    margin:4px 0 0;
+  }
+
+  body.selecting-mode .chip,
+  body.selecting-mode .list-item{
+    cursor:pointer;
+    outline:1.5px dashed #2f6fed;
+    outline-offset:1px;
+    background:rgba(47,111,237,0.08);
+  }
+
+  .chip.selected,
+  .list-item.selected{
+    outline:3px solid #1565c0 !important;
+    outline-offset:1px;
+    background:rgba(21,101,192,0.08) !important;
+  }
+
+  @media print{
+    .instructions{ display:none !important; }
+    body.selecting-mode .chip,
+    body.selecting-mode .list-item{
+      outline:none;
+      background:inherit;
+    }
+  }
+
+  @media screen and (max-width:900px){
+    body{ background:#ffffff; }
+    .page{
+      width:100%;
+      height:auto;
+      min-height:100vh;
+      padding:10px;
+      overflow:visible;
+    }
+    .header h1{ font-size:19px; }
+    .header .badge{ font-size:18px; }
+    .table-wrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      border-radius:10px;
+    }
+    table{
+      height:auto;
+      min-width:900px;
+    }
+    .footer{ margin-top:8px; font-size:10px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">🎒</div>
+    <div>
+      <h1>מערכת שעות – כיתה ג׳ זוהר</h1>
+      <div class="sub">שנה"ל תשפ"ו</div>
+    </div>
+    <div class="badge">📚</div>
+  </div>
+
+  <div class="instructions">
+    <div class="txt">
+      <p class="title" id="instr-title">👪 בניית מערכת אישית לילד/ה שלכם</p>
+      <p class="desc" id="instr-desc">בחרו יחד עם הילד/ה את השיעורים שלו/ה במערכת, ולאחר מכן ניתן להדפיס מערכת מותאמת אישית. אפשר גם להדפיס את המערכת הרגילה בלי לבחור כלום.</p>
+      <p class="disclaimer" id="disclaimer" hidden>הבחירות נשמרות רק בדפדפן הזה, במכשיר הזה. הן לא נשלחות ולא נשמרות בשום מקום אחר, וימחקו אם ינוקה מידע הגלישה בדפדפן.</p>
+    </div>
+    <div class="actions">
+      <button class="start-btn" id="start-btn" type="button">🎯 בחירת שיעורים</button>
+      <button class="print-btn" type="button" onclick="window.print()">🖨️ הדפסת מערכת</button>
+      <button class="clear-btn" id="clear-btn" type="button" hidden>🗑️ ניקוי כל הבחירות</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th class="time-head"></th>
+        <th class="sun"><span class="daynum">1️⃣</span><span class="dayname">ראשון</span></th>
+        <th class="mon"><span class="daynum">2️⃣</span><span class="dayname">שני</span></th>
+        <th class="tue"><span class="daynum">3️⃣</span><span class="dayname">שלישי</span></th>
+        <th class="wed"><span class="daynum">4️⃣</span><span class="dayname">רביעי</span></th>
+        <th class="thu"><span class="daynum">5️⃣</span><span class="dayname">חמישי</span></th>
+        <th class="fri"><span class="daynum">6️⃣</span><span class="dayname">שישי</span></th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Period 1 -->
+      <tr>
+        <td class="time"><span class="pnum">1</span><span class="ptime">8:00-8:45</span></td>
+        <td class="sun"><div class="chip"><span class="ic">☀️</span><span class="subj">מפגש</span><span class="who">זוהר</span></div></td>
+        <td class="mon"><div class="chip"><span class="ic">☀️</span><span class="subj">מפגש</span><span class="who">זוהר</span></div></td>
+        <td class="tue">
+          <div class="tue-cell">
+            <div class="tue-spine"><span class="spine-ic">🌳</span><span class="spine-text">יום חוץ</span></div>
+            <div class="tue-main"><div class="list-item"><span class="ic">☀️</span><span class="subj">מפגש</span></div></div>
+          </div>
+        </td>
+        <td class="wed"><div class="chip"><span class="ic">➕</span><span class="subj">חשבון</span><span class="who">איריס</span></div></td>
+        <td class="thu"><div class="chip"><span class="ic">☀️</span><span class="subj">מפגש</span><span class="who">זוהר</span></div></td>
+        <td class="fri"><div class="chip"><span class="ic">🎵</span><span class="subj">מקהלה צעירה</span><span class="who">אסף</span></div></td>
+      </tr>
+
+      <tr class="break"><td colspan="7"><span class="brk-label">הפסקה</span></td></tr>
+
+      <!-- Period 2 -->
+      <tr>
+        <td class="time"><span class="pnum">2</span><span class="ptime">9:00-9:50</span></td>
+        <td class="sun"><div class="chip"><span class="ic">🔤</span><span class="subj">אנגלית</span><span class="who">מייסה</span></div></td>
+        <td class="mon">
+          <div class="chip"><span class="ic">📖</span><span class="subj">שפה</span><span class="who">זוהר</span></div>
+        </td>
+        <td class="tue">
+          <div class="tue-cell">
+            <div class="tue-spine"><span class="spine-ic">🌳</span><span class="spine-text">יום חוץ</span></div>
+            <div class="tue-main"><div class="list-item"><span class="ic">📖</span><span class="subj">שפה 1</span></div></div>
+          </div>
+        </td>
+        <td class="wed">
+          <div class="chip"><span class="ic">📔</span><span class="subj">יומן ויזואלי</span><span class="who">הילה</span></div>
+          <div class="chip"><span class="ic">🥾</span><span class="subj">טיול</span><span class="who">יעל</span></div>
+          <div class="chip"><span class="ic">🎨</span><span class="subj">אמנות</span><span class="who">פרל</span></div>
+        </td>
+        <td class="thu">
+          <div class="chip"><span class="ic">🕊️</span><span class="subj">גיבורי שלום</span><span class="who">הילה</span></div>
+          <div class="chip"><span class="ic">🧭</span><span class="subj">שבילים</span><span class="who">זוהר</span></div>
+          <div class="chip"><span class="ic">⚽</span><span class="subj">חנ"ג</span><span class="who">נופר</span></div>
+        </td>
+        <td class="fri"><div class="chip"><span class="ic">🎵</span><span class="subj">מקהלה צעירה</span><span class="who">אסף</span></div></td>
+      </tr>
+
+      <!-- Period 3 -->
+      <tr>
+        <td class="time"><span class="pnum">3</span><span class="ptime">9:50-10:30</span></td>
+        <td class="sun"><div class="chip"><span class="ic">🗳️</span><span class="subj">שעת דמוקרטיה</span><span class="who">זוהר</span></div></td>
+        <td class="mon">
+          <div class="chip"><span class="ic">⚽</span><span class="subj">חנ"ג</span><span class="who">נופר</span></div>
+          <div class="chip"><span class="ic">📚</span><span class="subj">סופרים וסופרות</span><span class="who">זוהר</span></div>
+          <div class="chip"><span class="ic">💃</span><span class="subj">מחול</span><span class="who">ניצן</span></div>
+        </td>
+        <td class="tue">
+          <div class="tue-cell">
+            <div class="tue-spine"><span class="spine-ic">🌳</span><span class="spine-text">יום חוץ</span></div>
+            <div class="tue-main"><div class="list-item"><span class="ic">📖</span><span class="subj">שפה 2</span></div></div>
+          </div>
+        </td>
+        <td class="wed">
+          <div class="chip"><span class="ic">📔</span><span class="subj">יומן ויזואלי</span><span class="who">הילה</span></div>
+          <div class="chip"><span class="ic">🥾</span><span class="subj">טיול</span><span class="who">יעל</span></div>
+          <div class="chip"><span class="ic">🎨</span><span class="subj">אמנות</span><span class="who">פרל</span></div>
+        </td>
+        <td class="thu"><div class="chip"><span class="ic">📖</span><span class="subj">שפה</span><span class="who">זוהר</span></div></td>
+        <td class="fri">
+          <div class="chip"><span class="ic">✨</span><span class="subj">מגוון שישי</span><span class="who">זוהר</span></div>
+          <div class="chip"><span class="ic">🎨</span><span class="subj">אמנות סטודיו פתוח</span><span class="who">מיטל</span></div>
+        </td>
+      </tr>
+
+      <tr class="break"><td colspan="7"><span class="brk-label">הפסקה</span></td></tr>
+
+      <!-- Period 4 -->
+      <tr>
+        <td class="time"><span class="pnum">4</span><span class="ptime">11:00-11:45</span></td>
+        <td class="sun"><div class="chip"><span class="ic">📖</span><span class="subj">שפה</span><span class="who">זוהר</span></div></td>
+        <td class="mon">
+          <div class="chip"><span class="ic">🎭</span><span class="subj">תיאטרון</span><span class="who">אמנון</span></div>
+          <div class="chip"><span class="ic">📜</span><span class="subj">תורה</span><span class="who">ליאור</span></div>
+          <div class="chip"><span class="ic">💃</span><span class="subj">מחול</span><span class="who">ניצן</span></div>
+        </td>
+        <td class="tue">
+          <div class="tue-cell">
+            <div class="tue-spine"><span class="spine-ic">🌳</span><span class="spine-text">יום חוץ</span></div>
+            <div class="tue-main"><div class="list-item"><span class="ic">✨</span><span class="subj">מגוון</span></div></div>
+          </div>
+        </td>
+        <td class="wed">
+          <div class="chip"><span class="ic">⚽</span><span class="subj">חנ"ג</span><span class="who">מטר</span></div>
+        </td>
+        <td class="thu">
+          <div class="chip"><span class="ic">🎲</span><span class="subj">משחקי לוח-שטח</span><span class="who">ליאור</span></div>
+          <div class="chip"><span class="ic">🎨</span><span class="subj">אמנות סטודיו פתוח</span><span class="who">מיטל</span></div>
+        </td>
+        <td class="fri"><div class="chip"><span class="ic">🕯️</span><span class="subj">קבלת שבת</span><span class="who">זוהר</span></div></td>
+      </tr>
+
+      <tr class="break"><td colspan="7"><span class="brk-label">הפסקה</span></td></tr>
+
+      <!-- Period 5 -->
+      <tr>
+        <td class="time"><span class="pnum">5</span><span class="ptime">12:00-12:45</span></td>
+        <td class="sun"><div class="chip"><span class="ic">📖</span><span class="subj">שפה</span><span class="who">זוהר</span></div></td>
+        <td class="mon"><div class="chip"><span class="ic">➕</span><span class="subj">חשבון</span><span class="who">איריס</span></div></td>
+        <td class="tue">
+          <div class="tue-cell">
+            <div class="tue-spine"><span class="spine-ic">🌳</span><span class="spine-text">יום חוץ</span></div>
+            <div class="tue-main"><div class="list-item"><span class="subj">מפגש סוף יום</span></div></div>
+          </div>
+        </td>
+        <td class="wed"><div class="chip"><span class="ic">🔤</span><span class="subj">אנגלית</span><span class="who">מייסה</span></div></td>
+        <td class="thu"><div class="chip"><span class="ic">➕</span><span class="subj">חשבון</span><span class="who">איריס</span></div></td>
+        <td class="fri empty"></td>
+      </tr>
+
+      <tr class="break"><td colspan="7"><span class="brk-label">הפסקה</span></td></tr>
+
+      <!-- Period 6 -->
+      <tr>
+        <td class="time"><span class="pnum">6</span><span class="ptime">12:50-13:30</span></td>
+        <td class="sun">
+          <div class="chip"><span class="ic">🤝</span><span class="subj">חשבון-עמיתים</span></div>
+          <div class="chip"><span class="ic">🤸</span><span class="subj">אקרובטיקה (ממשיכים)</span></div>
+          <div class="chip"><span class="ic">💃</span><span class="subj">מחול</span></div>
+        </td>
+        <td class="mon"><div class="chip"><span class="ic">🎭</span><span class="subj">תיאטרון</span><span class="who">אמנון</span></div></td>
+        <td class="tue"><div class="chip"><span class="ic">🔬</span><span class="subj">מדעים</span><span class="who">מורן</span></div></td>
+        <td class="wed"><div class="chip"><span class="ic">🤸</span><span class="subj">אקרובטיקה (מתחילים)</span><span class="who">נופר</span></div></td>
+        <td class="thu empty"></td>
+        <td class="fri empty"></td>
+      </tr>
+
+    </tbody>
+  </table>
+  </div>
+
+  <div class="footer">כיתה ג׳ זוהר</div>
+
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'zohar3-schedule-selections-v1';
+  var DAY_CLASSES = ['sun','mon','tue','wed','thu','fri'];
+  var selecting = false;
+  var selections = new Set();
+  try{
+    selections = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+  }catch(e){ selections = new Set(); }
+
+  var startBtn = document.getElementById('start-btn');
+  var clearBtn = document.getElementById('clear-btn');
+  var titleEl = document.getElementById('instr-title');
+  var descEl = document.getElementById('instr-desc');
+  var disclaimerEl = document.getElementById('disclaimer');
+
+  var IDLE_TITLE = '👪 בניית מערכת אישית לילד/ה שלכם';
+  var IDLE_DESC = 'בחרו יחד עם הילד/ה את השיעורים שלו/ה במערכת, ולאחר מכן ניתן להדפיס מערכת מותאמת אישית. אפשר גם להדפיס את המערכת הרגילה בלי לבחור כלום.';
+  var SELECTING_TITLE = '✏️ מצב בחירה פעיל';
+  var SELECTING_DESC = 'לחצו על כל שיעור שהילד/ה משתתפ/ת בו כדי לסמן אותו. לחיצה נוספת מבטלת את הסימון. בסיום, לחצו על "סיימתי".';
+
+  function getChips(){
+    return document.querySelectorAll('.chip, .list-item');
+  }
+
+  function chipId(chip){
+    var td = chip.closest('td');
+    if(!td) return null;
+    var tr = td.closest('tr');
+    var timeCell = tr ? tr.querySelector('td.time .pnum') : null;
+    var period = timeCell ? timeCell.textContent.trim() : '0';
+    var dayClass = 'x';
+    for(var i=0;i<DAY_CLASSES.length;i++){
+      if(td.classList.contains(DAY_CLASSES[i])){ dayClass = DAY_CLASSES[i]; break; }
+    }
+    var subjEl = chip.querySelector('.subj');
+    var subj = subjEl ? subjEl.textContent.trim() : chip.textContent.trim();
+    return dayClass + '-' + period + '-' + subj;
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(selections))); }catch(e){}
+  }
+
+  function applyHighlights(){
+    getChips().forEach(function(chip){
+      var id = chipId(chip);
+      chip.classList.toggle('selected', !!id && selections.has(id));
+    });
+    var hasSelections = selections.size > 0;
+    clearBtn.hidden = !hasSelections;
+    disclaimerEl.hidden = !hasSelections;
+  }
+
+  function onChipClick(e){
+    if(!selecting) return;
+    var chip = e.currentTarget;
+    var td = chip.closest('td');
+    var id = chipId(chip);
+    if(!id) return;
+    var groupChips = td.querySelectorAll('.chip, .list-item');
+    var wasSelected = selections.has(id);
+    groupChips.forEach(function(c){
+      var cid = chipId(c);
+      if(cid) selections.delete(cid);
+    });
+    if(!wasSelected){ selections.add(id); }
+    save();
+    applyHighlights();
+  }
+
+  function enterSelecting(){
+    selecting = true;
+    document.body.classList.add('selecting-mode');
+    startBtn.textContent = '✅ סיימתי';
+    startBtn.classList.add('active');
+    titleEl.textContent = SELECTING_TITLE;
+    descEl.textContent = SELECTING_DESC;
+  }
+
+  function exitSelecting(){
+    selecting = false;
+    document.body.classList.remove('selecting-mode');
+    startBtn.textContent = '🎯 בחירת שיעורים';
+    startBtn.classList.remove('active');
+    titleEl.textContent = IDLE_TITLE;
+    descEl.textContent = IDLE_DESC;
+  }
+
+  startBtn.addEventListener('click', function(){
+    if(selecting){ exitSelecting(); } else { enterSelecting(); }
+  });
+
+  clearBtn.addEventListener('click', function(){
+    var ok = window.confirm('למחוק את כל הבחירות של הילד/ה? לא ניתן לשחזר את זה.');
+    if(!ok) return;
+    selections.clear();
+    save();
+    applyHighlights();
+  });
+
+  getChips().forEach(function(chip){
+    chip.addEventListener('click', onChipClick);
+  });
+
+  applyHighlights();
+})();
+</script>
+</body>
+</html>
